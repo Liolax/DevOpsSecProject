@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main  # Trigger on pushes to the main branch
-  workflow_dispatch:  # Enables manual workflow trigger
+  workflow_dispatch:  # Enable manual workflow trigger
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the source code from GitHub
+      # 1. Checkout the repository from GitHub
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -30,8 +30,8 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
         with:
-          context: ./frontend             
-          file: Dockerfile               
+          context: .                 
+          file: frontend/Dockerfile   
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-frontend:latest
 
@@ -39,7 +39,7 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v3
         with:
-          context: ./backend              
-          file: Dockerfile               
+          context: .                 
+          file: backend/Dockerfile    
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-backend:latest
