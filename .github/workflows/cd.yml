@@ -1,0 +1,33 @@
+name: Continuous Delivery and Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout Code
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Log in to Docker Hub using current secrets
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      # Step 3: Pull the Docker image, then retag it as "production"
+      - name: Pull and Tag Docker Image
+        run: |
+          docker pull liolax/my-devopssec-ca-app:${{ github.ref_name }}
+          docker tag liolax/my-devopssec-ca-app:${{ github.ref_name }} liolax/my-devopssec-ca-app:production
+
+      # Step 4: Deploy to Heroku (Deployment is on hold)
+      - name: Deploy to Heroku (placeholder)
+        run: |
+          echo "Deployment step to Heroku is currently disabled."
+          echo "Configure Heroku deployment using the Heroku CLI (e.g., heroku container:push and heroku container:release)."
+          echo "Configure MongoDB connection (e.g., via a Heroku add-on or external service) and set the needed environment variables."
