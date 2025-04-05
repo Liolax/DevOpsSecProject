@@ -1,0 +1,58 @@
+version: "3.8"
+
+# Define named volumes for persistence
+volumes:
+  mongo-data:
+
+# Define a custom network for isolation
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  # Frontend Service
+  frontend:
+    container_name: frontend-container
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80" # Map port 80 in container to port 3000 on host
+    depends_on:
+      - backend 
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000 # Connect frontend to backend
+    networks:
+      - app_network
+
+  # Backend Service
+  backend:
+    container_name: backend-container
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # Expose backend on port 5000
+    depends_on:
+      - mongo
+    healthcheck: 
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/notes_db # Connect backend to database
+    networks:
+      - app_network
+
+  # MongoDB Database Service
+  mongo:
+    container_name: mongo-container
+    image: mongo:4.4 
+    restart: always 
+    ports:
+      - "27017:27017" 
+    volumes:
+      - mongo-data:/data/db 
+    networks:
+      - app_network
