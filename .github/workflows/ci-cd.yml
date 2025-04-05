@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository from GitHub and include submodules.
+      # 1. Checkout the repository from GitHub (with submodules if any)
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -28,20 +28,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-      # 4. Build and push the frontend Docker image to Docker Hub.
+      # 4. Build and push the frontend Docker image.
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
         with:
-          context: ./frontend    
-          file: Dockerfile         
+          context: ./frontend      # Set build context to the frontend folder.
+          file: Dockerfile          # Uses frontend/Dockerfile relative to context.
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-frontend:latest
 
-      # 5. Build and push the backend Docker image to Docker Hub.
+      # 5. Build and push the backend Docker image.
       - name: Build and push backend image
         uses: docker/build-push-action@v3
         with:
-          context: ./backend      
-          file: Dockerfile       
+          context: ./backend       # Set build context to the backend folder.
+          file: Dockerfile          # Uses backend/Dockerfile relative to context.
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-backend:latest
