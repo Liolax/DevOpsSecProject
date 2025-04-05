@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main  # Trigger on pushes to the main branch
-  workflow_dispatch:  # Enable manual workflow trigger
+  workflow_dispatch:  # Enables manual workflow trigger
 
 jobs:
   build-and-push:
@@ -30,8 +30,8 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
         with:
-          context: .
-          file: ./frontend/Dockerfile
+          context: ./frontend             
+          file: Dockerfile               
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-frontend:latest
 
@@ -39,8 +39,7 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v3
         with:
-          context: .
-          file: ./backend/Dockerfile
+          context: ./backend              
+          file: Dockerfile               
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-backend:latest
-
