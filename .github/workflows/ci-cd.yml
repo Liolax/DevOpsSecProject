@@ -30,8 +30,8 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
         with:
-          context: .                 
-          file: frontend/Dockerfile   
+          context: ./frontend     # Set build context to the frontend folder
+          file: Dockerfile         # In this context, Dockerfile is at "./frontend/Dockerfile"
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-frontend:latest
 
@@ -39,7 +39,7 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v3
         with:
-          context: .                 
-          file: backend/Dockerfile    
+          context: ./backend      # Set build context to the backend folder
+          file: Dockerfile         # In this context, Dockerfile is at "./backend/Dockerfile"
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/devopssec-backend:latest
