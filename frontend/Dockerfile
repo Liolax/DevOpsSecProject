@@ -1,13 +1,13 @@
 FROM node:16.14.2 AS build
 WORKDIR /app
 
-# Debugging: Copy and verify package.json and package-lock.json
+# Debugging: Verify package.json and context files
 COPY package*.json ./
 RUN ls -al /app
 
 RUN npm install
 
-# Debugging: Verify all files are copied into the container
+# Debugging: Exclude build folder
 COPY . .
 RUN ls -al /app
 
