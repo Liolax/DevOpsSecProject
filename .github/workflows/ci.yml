@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - development
   pull_request:
     branches:
       - main
-      - development
 
 jobs:
   build:
@@ -23,7 +21,7 @@ jobs:
       - name: Cache Frontend Node Modules
         uses: actions/cache@v3
         with:
-          path: ~/.npm
+          path: frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
@@ -32,34 +30,26 @@ jobs:
       - name: Cache Backend Node Modules
         uses: actions/cache@v3
         with:
-          path: ~/.npm
+          path: backend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # Step 4: Set Docker Image Tag based on branch or tag
+      # Step 4: Set Docker Image Tag
       - name: Set Docker Image Tag
         id: set_tag
         run: |
-          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-          elif [ "${GITHUB_REF}" = "refs/heads/development" ]; then
-            echo "IMAGE_TAG=development" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "IMAGE_TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          else
-            echo "IMAGE_TAG=unknown" >> $GITHUB_ENV
-          fi
+          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
 
       # Step 5: Build the Frontend Image using the Dockerfile in the frontend folder
       - name: Build Frontend Image
         run: |
-          docker build -t liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }} -f frontend/Dockerfile frontend
+          docker build -t liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }} -f frontend/Dockerfile .
 
       # Step 6: Build the Backend Image using the Dockerfile in the backend folder
       - name: Build Backend Image
         run: |
-          docker build -t liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }} -f backend/Dockerfile backend
+          docker build -t liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }} -f backend/Dockerfile .
 
       # Step 7: Log in to Docker Hub using secrets
       - name: Docker Login

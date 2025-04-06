@@ -21,7 +21,7 @@ mongoose
     process.exit(1); // Exit the process if the database connection fails
   });
 
-// Enable CORS so that the frontend (port 3000) can call the API
+// Enable CORS so that the frontend can call the API
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -31,12 +31,6 @@ const noteSchema = new mongoose.Schema({
   content: { type: String, required: true },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
-});
-
-// Middleware to update `updated_at` on every save
-noteSchema.pre("save", function (next) {
-  this.updated_at = Date.now();
-  next();
 });
 
 const Note = mongoose.model("Note", noteSchema);
@@ -50,7 +44,7 @@ app.get("/health", (req, res) => {
 app.get("/notes", async (req, res) => {
   try {
     const notes = await Note.find();
-    console.log("Fetched notes:", notes); // Debug log
+    console.log("Fetched notes:", notes);
     res.json(
       notes.map((note) => ({
         ...note.toJSON(),
@@ -68,13 +62,13 @@ app.get("/notes/:id", async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
     if (note) {
-      console.log("Fetched note by ID:", note); // Debug log
+      console.log("Fetched note by ID:", note);
       res.json({
         ...note.toJSON(),
         id: note._id,
       });
     } else {
-      console.log("Note not found for ID:", req.params.id); // Debug log
+      console.log(`Note not found for ID: ${req.params.id}`);
       res.status(404).json({ message: "Note not found" });
     }
   } catch (err) {
@@ -93,7 +87,7 @@ app.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log("Validation errors:", errors.array());
+      console.error("Validation errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -101,7 +95,7 @@ app.post(
     try {
       const newNote = new Note({ title, content });
       const savedNote = await newNote.save();
-      console.log("Created new note:", savedNote); // Debug log
+      console.log("Created new note:", savedNote);
       res.status(201).json({ ...savedNote.toJSON(), id: savedNote._id });
     } catch (err) {
       console.error("Error creating note:", err);
@@ -120,25 +114,25 @@ app.put(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log("Validation errors:", errors.array());
+      console.error("Validation errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { title, content } = req.body;
-    console.log(`Received request to update note with ID: ${req.params.id}`);
-    console.log(`Request Body:`, req.body);
+    console.log(`Updating note with ID: ${req.params.id}`);
 
     try {
+      // Ensure only the specific note is updated
       const updatedNote = await Note.findByIdAndUpdate(
         req.params.id,
-        { title, content, updated_at: Date.now() }, // Explicitly update `updated_at`
-        { new: true }
+        { title, content, updated_at: new Date() }, // Explicitly set updated_at to current date
+        { new: true } // Return the updated document
       );
       if (updatedNote) {
-        console.log("Successfully updated note:", updatedNote); // Debug log
+        console.log("Updated note:", updatedNote);
         res.json({ ...updatedNote.toJSON(), id: updatedNote._id });
       } else {
-        console.log("Note not found for ID:", req.params.id); // Debug log
+        console.log(`Note not found for ID: ${req.params.id}`);
         res.status(404).json({ message: "Note not found" });
       }
     } catch (err) {
@@ -153,10 +147,10 @@ app.delete("/notes/:id", async (req, res) => {
   try {
     const deletedNote = await Note.findByIdAndDelete(req.params.id);
     if (deletedNote) {
-      console.log("Deleted note:", deletedNote); // Debug log
+      console.log("Deleted note:", deletedNote);
       res.json({ ...deletedNote.toJSON(), id: deletedNote._id });
     } else {
-      console.log("Note not found for ID:", req.params.id); // Debug log
+      console.log(`Note not found for ID: ${req.params.id}`);
       res.status(404).json({ message: "Note not found" });
     }
   } catch (err) {
