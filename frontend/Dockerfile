@@ -1,6 +1,8 @@
 # Step 1: Build the React app
-FROM node:16 AS build
+FROM node:16.14.2 AS build
 WORKDIR /app
+
+# Use a caching mechanism for node_modules
 COPY package*.json ./
 RUN npm install
 COPY . .
