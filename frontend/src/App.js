@@ -8,7 +8,6 @@ const API_URL = "http://localhost:5000/notes";
 function App() {
   // State variables
   const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true); // Indicates when data is loading
   const [formNote, setFormNote] = useState({ id: null, title: "", content: "" });
   const [isEditing, setIsEditing] = useState(false); // Tracks edit mode
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,7 +18,6 @@ function App() {
   // Fetch all notes from the API
   const fetchNotes = async () => {
     try {
-      setLoading(true);
       setError(null); // Reset errors
       const res = await fetch(API_URL);
       if (!res.ok) throw new Error(`Failed to fetch notes: ${res.status} ${res.statusText}`);
@@ -30,8 +28,6 @@ function App() {
     } catch (err) {
       setError(err.message);
       toast.error("Error fetching notes");
-    } finally {
-      setLoading(false);
     }
   };
 
