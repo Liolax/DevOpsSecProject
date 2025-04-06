@@ -23,9 +23,9 @@ mongoose
 
 // Enable CORS so that the frontend can call the API
 app.use(cors({
-  origin: "https://diary-notes-project.vercel.app", 
+  origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"], // Allow both deployed and local frontend
   methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
-  credentials: true 
+  credentials: true // 
 }));
 
 app.use(bodyParser.json());
