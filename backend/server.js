@@ -42,7 +42,7 @@ const Note = mongoose.model("Note", noteSchema);
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Welcome to the DevOpsSec Backend!");
+  res.send("Welcome to the DevOpsSec Project Backend!");
 });
 
 // Health endpoint
