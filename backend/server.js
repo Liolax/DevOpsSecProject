@@ -35,6 +35,11 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the DevOpsSec Backend!");
+});
+
 // Health endpoint
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
@@ -124,8 +129,8 @@ app.put(
     try {
       // Ensure only the specific note is updated
       const updatedNote = await Note.findOneAndUpdate(
-        { _id: req.params.id }, 
-        { title, content, updated_at: Date.now() }, 
+        { _id: req.params.id },
+        { title, content, updated_at: Date.now() },
         { new: true, runValidators: true } // Return the updated document and validate fields
       );
 
