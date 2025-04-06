@@ -81,10 +81,18 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: formNote.title, content: formNote.content }),
       });
-      const updatedNote = await res.json();
-      console.log("Updated Note Response:", updatedNote); // Debug log
       if (!res.ok) throw new Error(`Failed to update note: ${res.status} ${res.statusText}`);
-      await fetchNotes(); // Refresh notes list
+      
+      const updatedNote = await res.json();
+      console.log("Updated Note Response:", updatedNote);
+
+      // Update the notes state directly
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === updatedNote.id ? updatedNote : note // Update only the edited note
+        )
+      );
+
       setFormNote({ id: null, title: "", content: "" }); // Reset form
       setIsEditing(false);
       toast.success("Note updated successfully!");

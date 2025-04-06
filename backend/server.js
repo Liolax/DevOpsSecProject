@@ -126,7 +126,7 @@ app.put(
       const updatedNote = await Note.findOneAndUpdate(
         { _id: req.params.id }, 
         { title, content, updated_at: Date.now() }, 
-        { new: true, runValidators: true } 
+        { new: true, runValidators: true } // Return the updated document and validate fields
       );
 
       if (updatedNote) {
