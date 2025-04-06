@@ -3,7 +3,8 @@ import "./App.css";
 import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer for notifications
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "http://localhost:5000/notes";
+// API_URL to point to the deployed backend
+const API_URL = "https://devopssec-backend.onrender.com/notes";
 
 function App() {
   // State variables

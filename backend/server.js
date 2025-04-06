@@ -16,7 +16,10 @@ const MONGO_URI = process.env.MONGO_URI;
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("Connected to MongoDB Atlas"))
-  .catch((err) => console.error("Error connecting to MongoDB:", err));
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
+    process.exit(1); // Exit the process if the database connection fails
+  });
 
 // Enable CORS so that the frontend (port 3000) can call the API
 app.use(cors());
@@ -47,6 +50,7 @@ app.get("/health", (req, res) => {
 app.get("/notes", async (req, res) => {
   try {
     const notes = await Note.find();
+    console.log("Fetched notes:", notes); // Debug log
     res.json(
       notes.map((note) => ({
         ...note.toJSON(),
@@ -64,11 +68,13 @@ app.get("/notes/:id", async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
     if (note) {
+      console.log("Fetched note by ID:", note); // Debug log
       res.json({
         ...note.toJSON(),
         id: note._id,
       });
     } else {
+      console.log("Note not found for ID:", req.params.id); // Debug log
       res.status(404).json({ message: "Note not found" });
     }
   } catch (err) {
@@ -132,7 +138,7 @@ app.put(
         console.log("Successfully updated note:", updatedNote); // Debug log
         res.json({ ...updatedNote.toJSON(), id: updatedNote._id });
       } else {
-        console.log("Note not found for ID:", req.params.id);
+        console.log("Note not found for ID:", req.params.id); // Debug log
         res.status(404).json({ message: "Note not found" });
       }
     } catch (err) {
@@ -150,7 +156,7 @@ app.delete("/notes/:id", async (req, res) => {
       console.log("Deleted note:", deletedNote); // Debug log
       res.json({ ...deletedNote.toJSON(), id: deletedNote._id });
     } else {
-      console.log("Note not found for ID:", req.params.id);
+      console.log("Note not found for ID:", req.params.id); // Debug log
       res.status(404).json({ message: "Note not found" });
     }
   } catch (err) {
@@ -161,7 +167,7 @@ app.delete("/notes/:id", async (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Unhandled error:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
