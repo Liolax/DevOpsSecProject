@@ -22,7 +22,12 @@ mongoose
   });
 
 // Enable CORS so that the frontend can call the API
-app.use(cors());
+app.use(cors({
+  origin: "https://diary-notes-project.vercel.app", 
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
+  credentials: true 
+}));
+
 app.use(bodyParser.json());
 
 // Define a Note schema and model
