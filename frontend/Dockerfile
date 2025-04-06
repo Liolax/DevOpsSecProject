@@ -2,13 +2,14 @@
 FROM node:16.14.2 AS build
 WORKDIR /app
 
-# Use a caching mechanism for node_modules
+# Debugging: Check if package.json exists
 COPY package*.json ./
+RUN ls -al /app
+
 RUN npm install
 COPY . .
 RUN npm run build
 
-# Step 2: Serve the built files with Nginx
 FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html
 EXPOSE 80
