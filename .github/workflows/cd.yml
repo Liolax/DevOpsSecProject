@@ -25,9 +25,9 @@ jobs:
           docker pull liolax/my-devopssec-ca-app:${{ github.ref_name }}
           docker tag liolax/my-devopssec-ca-app:${{ github.ref_name }} liolax/my-devopssec-ca-app:production
 
-      # Step 4: Deploy to Heroku (Deployment is on hold)
-      - name: Deploy to Heroku (placeholder)
+      # Step 4: Deploy to Render (Deployment is on hold)
+      - name: Deploy to Render (placeholder)
         run: |
-          echo "Deployment step to Heroku is currently disabled."
-          echo "Configure Heroku deployment using the Heroku CLI (e.g., heroku container:push and heroku container:release)."
-          echo "Configure MongoDB connection (e.g., via a Heroku add-on or external service) and set the needed environment variables."
+          echo "Deployment step to Render is currently disabled."
+          echo "Configure Render deployment using the Render."
+          echo "Configure MongoDB connection (e.g., via a Render or external service) and set the needed environment variables."

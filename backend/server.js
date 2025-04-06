@@ -123,11 +123,12 @@ app.put(
 
     try {
       // Ensure only the specific note is updated
-      const updatedNote = await Note.findByIdAndUpdate(
-        req.params.id,
-        { title, content, updated_at: new Date() }, // Explicitly set updated_at to current date
-        { new: true } // Return the updated document
+      const updatedNote = await Note.findOneAndUpdate(
+        { _id: req.params.id }, 
+        { title, content, updated_at: Date.now() }, 
+        { new: true, runValidators: true } 
       );
+
       if (updatedNote) {
         console.log("Updated note:", updatedNote);
         res.json({ ...updatedNote.toJSON(), id: updatedNote._id });
