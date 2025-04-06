@@ -1,14 +1,14 @@
 FROM node:16.14.2 AS build
 WORKDIR /app
 
-# Debugging: Ensure package.json is copied
+# Debugging: Copy and verify package.json and package-lock.json
 COPY package*.json ./
 RUN ls -al /app
 
 RUN npm install
-COPY . .
 
-# Debugging: Ensure all files, including React source files, are present
+# Debugging: Verify all files are copied into the container
+COPY . .
 RUN ls -al /app
 
 RUN npm run build
