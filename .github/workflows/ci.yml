@@ -26,42 +26,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # Step 3: Cache Node Modules for Backend
-      - name: Cache Backend Node Modules
-        uses: actions/cache@v3
-        with:
-          path: backend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      # Step 4: Set Docker Image Tag
-      - name: Set Docker Image Tag
-        id: set_tag
+      # Step 3: Debug: Check the frontend directory
+      - name: Debug Frontend Directory
         run: |
-          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          ls -al frontend/
+          cat frontend/package.json
 
-      # Step 5: Build the Frontend Image using the Dockerfile in the frontend folder
+      # Step 4: Build the Frontend Image
       - name: Build Frontend Image
         run: |
-          docker build -t liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }} -f frontend/Dockerfile .
+          docker build -t liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }} -f frontend/Dockerfile ./frontend
 
-      # Step 6: Build the Backend Image using the Dockerfile in the backend folder
+      # Step 5: Build the Backend Image
       - name: Build Backend Image
         run: |
-          docker build -t liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }} -f backend/Dockerfile .
+          docker build -t liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }} -f backend/Dockerfile ./backend
 
-      # Step 7: Log in to Docker Hub using secrets
+      # Step 6: Log in to Docker Hub using secrets
       - name: Docker Login
         run: |
           echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # Step 8: Push the Frontend Image to Docker Hub
+      # Step 7: Push the Frontend Image to Docker Hub
       - name: Push Frontend Image
         run: |
           docker push liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }}
 
-      # Step 9: Push the Backend Image to Docker Hub
+      # Step 8: Push the Backend Image to Docker Hub
       - name: Push Backend Image
         run: |
           docker push liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }}
+
