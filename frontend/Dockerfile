@@ -1,13 +1,16 @@
-# Step 1: Build the React app
 FROM node:16.14.2 AS build
 WORKDIR /app
 
-# Debugging: Check if package.json exists
+# Debugging: Ensure package.json is copied
 COPY package*.json ./
 RUN ls -al /app
 
 RUN npm install
 COPY . .
+
+# Debugging: Ensure all files, including React source files, are present
+RUN ls -al /app
+
 RUN npm run build
 
 FROM nginx:alpine
