@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // Import required modules
 const express = require("express");
 const cors = require("cors");
