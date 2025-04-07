@@ -182,12 +182,13 @@ app.delete("/notes/:id", async (req, res) => {
 });
 
 // Global error handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, _next) => {
   console.error("Unhandled error:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// Start the server without assigning it to a variable
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log("Note: HTTPS termination is managed by the hosting provider (Render).");
