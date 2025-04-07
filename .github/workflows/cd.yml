@@ -19,15 +19,15 @@ jobs:
         run: |
           echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # Step 3: Pull the Docker image, then retag it as "production"
+      # Step 3: Pull the Docker image and retag it as "production"
       - name: Pull and Tag Docker Image
         run: |
           docker pull liolax/my-devopssec-ca-app:${{ github.ref_name }}
           docker tag liolax/my-devopssec-ca-app:${{ github.ref_name }} liolax/my-devopssec-ca-app:production
 
-      # Step 4: Deploy to Render (Deployment is on hold)
-      - name: Deploy to Render (placeholder)
+      # Step 4: Trigger Deployment on Render using the Deploy Hook
+      - name: Trigger Render Deployment
         run: |
-          echo "Deployment step to Render is currently disabled."
-          echo "Configure Render deployment using the Render."
-          echo "Configure MongoDB connection (e.g., via a Render or external service) and set the needed environment variables."
+          echo "Triggering Render deployment..."
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
