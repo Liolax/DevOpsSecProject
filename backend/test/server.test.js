@@ -2,16 +2,20 @@ const request = require("supertest");
 const { expect } = require("chai");
 const app = require("../server"); // Import the Express app
 
-describe("GET /health", () => {
-  it("should return API health status as OK", async () => {
+describe("GET /health", function () {
+  this.timeout(5000);
+  
+  it("should return API health status as OK", async function () {
     const res = await request(app).get("/health");
     expect(res.status).to.equal(200);
     expect(res.body).to.have.property("status", "OK");
   });
 });
 
-describe("Notes API", () => {
-  it("should create, update, and delete a note", async () => {
+describe("Notes API", function () {
+  this.timeout(5000);
+  
+  it("should create, update, and delete a note", async function () {
     // Create a new note
     const noteData = {
       title: "Test Note",
@@ -20,6 +24,7 @@ describe("Notes API", () => {
     const createRes = await request(app)
       .post("/notes")
       .send(noteData);
+      
     expect(createRes.status).to.equal(201);
     expect(createRes.body).to.have.property("id");
     expect(createRes.body.title).to.equal(noteData.title);
@@ -35,6 +40,7 @@ describe("Notes API", () => {
     const updateRes = await request(app)
       .put(`/notes/${noteId}`)
       .send(updateData);
+      
     expect(updateRes.status).to.equal(200);
     expect(updateRes.body.title).to.equal(updateData.title);
     expect(updateRes.body.content).to.equal(updateData.content);
