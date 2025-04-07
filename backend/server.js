@@ -32,11 +32,13 @@ mongoose
 app.use(helmet());
 
 // Enable CORS so that only the necessary origins can access the API
-app.use(cors({
-  origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 // Parse incoming JSON payloads
 app.use(bodyParser.json());
@@ -189,4 +191,5 @@ const server = app.listen(PORT, () => {
 
 // Export the app for testing purposes
 module.exports = app;
+
 

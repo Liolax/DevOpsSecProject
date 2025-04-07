@@ -1,18 +1,11 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const app = require('../server'); // Assuming server.js exports the Express app
-const { expect } = chai;
+const request = require("supertest");
+const { expect } = require("chai");
+const app = require("../server"); // Import the Express app
 
-chai.use(chaiHttp);
-
-describe('GET /health', () => {
-  it('should return API health status as OK', (done) => {
-    chai.request(app)
-      .get('/health')
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body).to.have.property('status').that.equals('OK');
-        done();
-      });
+describe("GET /health", () => {
+  it("should return API health status as OK", async () => {
+    const res = await request(app).get("/health");
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property("status", "OK");
   });
 });
