@@ -3,8 +3,10 @@ import "./App.css";
 import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer for notifications
 import "react-toastify/dist/ReactToastify.css";
 
-// API_URL to point to the deployed backend
-const API_URL = "https://devopssec-backend.onrender.com/notes";
+// Use the environment variable for the backend URL or fallback to a local URL
+const API_URL = process.env.REACT_APP_API_URL
+  ? `${process.env.REACT_APP_API_URL}/notes`
+  : "http://localhost:5000/notes";
 
 function App() {
   // State variables
@@ -21,9 +23,10 @@ function App() {
     try {
       setError(null); // Reset errors
       const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`Failed to fetch notes: ${res.status} ${res.statusText}`);
+      if (!res.ok)
+        throw new Error(`Failed to fetch notes: ${res.status} ${res.statusText}`);
       const data = await res.json();
-      console.log("Fetched Notes:", data); // Debug log for backend response
+      console.log("Fetched Notes:", data);
       setNotes(data);
       toast.success("Notes loaded successfully!");
     } catch (err) {
@@ -39,7 +42,7 @@ function App() {
   // Handle form inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormNote({ ...formNote, [name]: value }); // Update form state
+    setFormNote({ ...formNote, [name]: value });
   };
 
   // Add a new note
@@ -54,11 +57,12 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: formNote.title, content: formNote.content }),
       });
-      if (!res.ok) throw new Error(`Failed to add note: ${res.status} ${res.statusText}`);
+      if (!res.ok)
+        throw new Error(`Failed to add note: ${res.status} ${res.statusText}`);
       await fetchNotes(); // Refresh notes list
-      setFormNote({ id: null, title: "", content: "" }); // Reset form
+      setFormNote({ id: null, title: "", content: "" });
       toast.success("Note added successfully!");
-    } catch (error) {
+    } catch (err) {
       toast.error("Error adding note");
     }
   };
@@ -81,7 +85,8 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: formNote.title, content: formNote.content }),
       });
-      if (!res.ok) throw new Error(`Failed to update note: ${res.status} ${res.statusText}`);
+      if (!res.ok)
+        throw new Error(`Failed to update note: ${res.status} ${res.statusText}`);
       
       const updatedNote = await res.json();
       console.log("Updated Note Response:", updatedNote);
@@ -89,14 +94,14 @@ function App() {
       // Update the notes state directly
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
-          note.id === updatedNote.id ? updatedNote : note // Update only the edited note
+          note.id === updatedNote.id ? updatedNote : note
         )
       );
 
-      setFormNote({ id: null, title: "", content: "" }); // Reset form
+      setFormNote({ id: null, title: "", content: "" });
       setIsEditing(false);
       toast.success("Note updated successfully!");
-    } catch (error) {
+    } catch (err) {
       toast.error("Error updating note");
     }
   };
@@ -108,10 +113,11 @@ function App() {
       const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error(`Failed to delete note: ${res.status} ${res.statusText}`);
+      if (!res.ok)
+        throw new Error(`Failed to delete note: ${res.status} ${res.statusText}`);
       await fetchNotes(); // Refresh notes list
       toast.success("Note deleted successfully!");
-    } catch (error) {
+    } catch (err) {
       toast.error("Error deleting note");
     }
   };
@@ -161,7 +167,9 @@ function App() {
           placeholder="Content"
           name="content"
           value={formNote.content}
-          onChange={(e) => setFormNote({ ...formNote, content: e.target.value })}
+          onChange={(e) =>
+            setFormNote({ ...formNote, content: e.target.value })
+          }
         ></textarea>
         {isEditing ? (
           <button onClick={handleUpdateNote}>Update Note</button>
@@ -184,15 +192,19 @@ function App() {
                 <h3>{note.title}</h3>
                 <p>{note.content}</p>
                 <p>
-                  <strong>Created At:</strong> {new Date(note.created_at).toLocaleString()}
+                  <strong>Created At:</strong>{" "}
+                  {new Date(note.created_at).toLocaleString()}
                 </p>
                 {note.updated_at && (
                   <p>
-                    <strong>Updated At:</strong> {new Date(note.updated_at).toLocaleString()}
+                    <strong>Updated At:</strong>{" "}
+                    {new Date(note.updated_at).toLocaleString()}
                   </p>
                 )}
                 <button onClick={() => handleEditNote(note)}>Edit</button>
-                <button onClick={() => handleDeleteNote(note.id || note._id)}>Delete</button>
+                <button onClick={() => handleDeleteNote(note.id || note._id)}>
+                  Delete
+                </button>
               </li>
             ))}
           </ul>
@@ -200,11 +212,13 @@ function App() {
 
         {/* Pagination Controls */}
         <div className="pagination">
-          {[...Array(Math.ceil(filteredNotes.length / notesPerPage)).keys()].map((number) => (
-            <button key={number} onClick={() => paginate(number + 1)}>
-              {number + 1}
-            </button>
-          ))}
+          {[...Array(Math.ceil(filteredNotes.length / notesPerPage)).keys()].map(
+            (number) => (
+              <button key={number} onClick={() => paginate(number + 1)}>
+                {number + 1}
+              </button>
+            )
+          )}
         </div>
       </div>
 

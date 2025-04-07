@@ -9,11 +9,17 @@ require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
 
-// Set the backend port: Render (or environment) should expose port 5000 for the backend.
+// Use the PORT specified in the environment or default to 5000
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB Atlas using connection string from .env
+// Retrieve the MongoDB URI from environment variables
 const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error("Error: MONGO_URI is not defined in the environment variables.");
+  process.exit(1);
+}
+
+// Connect to MongoDB Atlas with the MONGO_URI stored in the environment
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("Connected to MongoDB Atlas"))
@@ -22,11 +28,10 @@ mongoose
     process.exit(1); // Exit if the database connection fails
   });
 
-// Enhance security with Helmet to set secure HTTP headers
+// Enhance security by setting HTTP headers with Helmet
 app.use(helmet());
 
-// Enable CORS for allowed origins:
-// Allows calls from the deployed frontend and local development environment
+// Enable CORS so that only the necessary origins can access the API
 app.use(cors({
   origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"],
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -43,10 +48,9 @@ const noteSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
-
 const Note = mongoose.model("Note", noteSchema);
 
-// Root route: A simple welcome message
+// Root route
 app.get("/", (req, res) => {
   res.send("Welcome to the DevOpsSec Project Backend!");
 });
@@ -64,7 +68,7 @@ app.get("/notes", async (req, res) => {
     res.json(
       notes.map((note) => ({
         ...note.toJSON(),
-        id: note._id, // Map MongoDB _id to id for frontend compatibility
+        id: note._id,
       }))
     );
   } catch (err) {
@@ -106,7 +110,6 @@ app.post(
       console.error("Validation errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { title, content } = req.body;
     try {
       const newNote = new Note({ title, content });
@@ -133,17 +136,14 @@ app.put(
       console.error("Validation errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { title, content } = req.body;
     console.log(`Updating note with ID: ${req.params.id}`);
-
     try {
       const updatedNote = await Note.findOneAndUpdate(
         { _id: req.params.id },
         { title, content, updated_at: Date.now() },
-        { new: true, runValidators: true } // Return updated document with validation
+        { new: true, runValidators: true }
       );
-
       if (updatedNote) {
         console.log("Updated note:", updatedNote);
         res.json({ ...updatedNote.toJSON(), id: updatedNote._id });
@@ -184,5 +184,5 @@ app.use((err, req, res, next) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log("Note: HTTPS is managed by the hosting provider. The backend exposes only port 5000 for HTTP traffic.");
+  console.log("Note: HTTPS termination is managed by the hosting provider (Render).");
 });

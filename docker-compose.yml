@@ -1,10 +1,6 @@
-version: "3.8"
-
-# Define named volumes for persistence
 volumes:
   mongo-data:
 
-# Define a custom network for isolation
 networks:
   app_network:
     driver: bridge
@@ -17,11 +13,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80" # Map port 80 in container to port 3000 on host
+      - "3000:80"  # Map container port (80, served by Nginx) to host port 3000
     depends_on:
       - backend 
     environment:
-      - REACT_APP_API_URL=http://localhost:5000 # Connect frontend to backend
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
     networks:
       - app_network
 
@@ -32,27 +28,29 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5000:5000" # Expose backend on port 5000
+      - "5001:5000"  # Map container port 5000 to host port 5001
     depends_on:
       - mongo
-    healthcheck: 
+    healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    env_file:
+      - .env  # Loads REACT_APP_API_URL and MONGO_URI from the root .env file
     environment:
-      - MONGO_URI=mongodb://mongo:27017/notes_db # Connect backend to database
+      - PORT=5000
     networks:
       - app_network
 
-  # MongoDB Database Service
+  # MongoDB Service
   mongo:
     container_name: mongo-container
-    image: mongo:4.4 
-    restart: always 
+    image: mongo:4.4
+    restart: always
     ports:
-      - "27017:27017" 
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db 
+      - mongo-data:/data/db
     networks:
       - app_network
