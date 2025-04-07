@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import React from "react"; // To satisfy ESLint rules for JSX scope
 import { useState, useEffect } from "react";
 import "./App.css";
