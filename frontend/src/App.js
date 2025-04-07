@@ -1,3 +1,4 @@
+import React from "react"; // To satisfy ESLint rules for JSX scope
 import { useState, useEffect } from "react";
 import "./App.css";
 import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer for notifications
