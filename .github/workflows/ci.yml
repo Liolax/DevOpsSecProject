@@ -19,48 +19,72 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      # Step 2: Audit Dependencies
-      - name: Audit Dependencies
-        run: |
-          npm install
-          npm audit --audit-level=moderate
+      # Frontend Steps
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
 
-      # Step 3: Cache Frontend Node Modules
+      - name: Audit Frontend Dependencies
+        working-directory: ./frontend
+        run: npm audit --audit-level=moderate
+
+      - name: Run Frontend Tests
+        working-directory: ./frontend
+        run: npm test -- --watchAll=false
+
+      - name: Lint Frontend Code
+        working-directory: ./frontend
+        run: npm run lint
+
       - name: Cache Frontend Node Modules
         uses: actions/cache@v3
         with:
           path: frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          key: ${{ runner.os }}-frontend-node-${{ hashFiles('frontend/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-frontend-node-
 
-      # Step 4: Debug: Check the frontend directory
+      # Backend Steps
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Audit Backend Dependencies
+        working-directory: ./backend
+        run: npm audit --audit-level=moderate
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Lint Backend Code
+        working-directory: ./backend
+        run: npm run lint
+
+      # Debug: List frontend directory for verification
       - name: Debug Frontend Directory
         run: |
           ls -al frontend/
           cat frontend/package.json
 
-      # Step 5: Build the Frontend Image
+      # Docker Build Steps
       - name: Build Frontend Image
         run: |
           docker build -t liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }} -f frontend/Dockerfile ./frontend
 
-      # Step 6: Build the Backend Image
       - name: Build Backend Image
         run: |
           docker build -t liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }} -f backend/Dockerfile ./backend
 
-      # Step 7: Log in to Docker Hub using secrets
+      # Docker Hub Login & Push Steps
       - name: Docker Login
         run: |
           echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # Step 8: Push the Frontend Image to Docker Hub
       - name: Push Frontend Image
         run: |
           docker push liolax/my-devopssec-ca-app:frontend-${{ env.IMAGE_TAG }}
 
-      # Step 9: Push the Backend Image to Docker Hub
       - name: Push Backend Image
         run: |
           docker push liolax/my-devopssec-ca-app:backend-${{ env.IMAGE_TAG }}

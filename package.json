@@ -17,5 +17,10 @@
   "bugs": {
     "url": "https://github.com/Liolax/DevOpsSecProject/issues"
   },
-  "homepage": "https://github.com/Liolax/DevOpsSecProject#readme"
+  "homepage": "https://github.com/Liolax/DevOpsSecProject#readme",
+  "devDependencies": {
+    "eslint": "^9.24.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0"
+  }
 }

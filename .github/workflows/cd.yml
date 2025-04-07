@@ -10,24 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout Code
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Log in to Docker Hub using current secrets
+      # Step 2: Log in to Docker Hub using provided secrets
       - name: Log in to Docker Hub
         run: |
           echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # Step 3: Pull the Docker image and retag it as "production"
-      - name: Pull and Tag Docker Image
+      # Step 3: Pull the Docker image for the current tag,
+      # retag it as "production", and push the production tag
+      - name: Pull, Tag, and Push Docker Image
         run: |
           docker pull liolax/my-devopssec-ca-app:${{ github.ref_name }}
           docker tag liolax/my-devopssec-ca-app:${{ github.ref_name }} liolax/my-devopssec-ca-app:production
+          docker push liolax/my-devopssec-ca-app:production
 
       # Step 4: Trigger Deployment on Render using the Deploy Hook
       - name: Trigger Render Deployment
         run: |
           echo "Triggering Render deployment..."
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
-
