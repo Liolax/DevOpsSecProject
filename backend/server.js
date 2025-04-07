@@ -6,7 +6,7 @@ const helmet = require("helmet"); // Security middleware for HTTP headers
 const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
 
-// Explicitly load environment variables from backend/.env
+// Explicitly load environment variables from a .env file located in the same folder
 require("dotenv").config({ path: __dirname + "/.env" });
 
 const app = express();

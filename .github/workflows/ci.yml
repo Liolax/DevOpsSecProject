@@ -19,6 +19,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      # Step 2: Create backend .env file from secrets
+      - name: Create backend .env file
+        working-directory: ./backend
+        run: |
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
+          echo "PORT=5000" >> .env
+
       # Frontend Steps
       - name: Install Frontend Dependencies
         working-directory: ./frontend
