@@ -1,5 +1,5 @@
 import React from "react"; // To satisfy ESLint
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import App from "./App";
 
 // A mock array of notes to simulate data coming from the API
@@ -20,7 +20,7 @@ const mockNotes = [
   },
 ];
 
-// Before each test, mock the global fetch to return the mockNotes by default
+// Before each test, mock the global fetch to return our mockNotes by default
 beforeEach(() => {
   jest.spyOn(global, "fetch").mockResolvedValue({
     ok: true,
@@ -40,7 +40,10 @@ test("renders the main heading", () => {
 });
 
 test("displays notes when fetch returns data", async () => {
-  render(<App />);
+  await act(async () => {
+    render(<App />);
+  });
+
   // Wait until at least one note title is rendered
   const noteTitleElement = await waitFor(() =>
     screen.getByText(mockNotes[0].title)
@@ -54,8 +57,11 @@ test("displays 'No notes found.' when no notes are returned", async () => {
     ok: true,
     json: async () => [],
   });
-  
-  render(<App />);
+
+  await act(async () => {
+    render(<App />);
+  });
+
   // Wait until the "No notes found." message appears
   const messageElement = await waitFor(() =>
     screen.getByText(/no notes found/i)
