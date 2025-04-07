@@ -1,70 +1,282 @@
-# Getting Started with Create React App
+# Diary Notes Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, full-stack diary notes application that enables users to create, read, update, and delete diary entries (CRUD). This project is built with a React frontend and an Express/Node.js backend, with MongoDB as the database.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Table of Contents
 
-### `npm start`
+- [Project Overview](#project-overview)
+- [Application Architecture](#application-architecture)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+  - [Database](#database)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Container & Docker Compose Integration](#container--docker-compose-integration)
+- [Security Considerations](#security-considerations)
+- [Next Steps & Deliverables](#next-steps--deliverables)
+- [Getting Started](#getting-started)
+- [Contributing](#contributing)
+- [License](#license)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Overview
 
-### `npm test`
+This project is designed as a full-stack diary notes application with a clear separation between the frontend and backend:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Separation of Concerns:**  
+  - The **backend** handles server-side logic, RESTful API endpoints, input validation, and database interactions. Entry point: `server.js`.
+  - The **frontend** is built using React and provides an intuitive interface for users to manage their diary notes.
+  
+- **Testing & Version Control:**  
+  - Comprehensive testing is in place for both frontend (using Jest/React Testing Library) and backend (using Mocha/Chai/Supertest).
+  - Version control is managed with Git and GitHub, following modern collaboration and commit practices.
 
-### `npm run build`
+- **Documentation & CI/CD:**  
+  - Essential project files include well-maintained `.gitignore` files and a detailed `README.md` (this document).
+  - The CI/CD pipeline is automated with GitHub Actions to ensure code quality, run tests, and deploy updated Docker containers.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Application Architecture
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Frontend
 
-### `npm run eject`
+- **Purpose:**  
+  Provides an intuitive, responsive interface that allows users to create, read, update, and delete diary notes effortlessly (CRUD).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **Technology:**  
+  Built using React.js as a Single Page Application (SPA).
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Key Features:**  
+  - Homepage displaying all existing notes.
+  - Forms and buttons for CRUD (Create, Read, Update, Delete) operations.
+  - Responsive design for both desktop and mobile users.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Containerization & Hosting:**  
+  - The frontend is containerized with a Dockerfile that installs Node.js, builds the app using `npm run build`, and (optionally) uses an Nginx image to serve static files.
+  - Deployed on free platforms like Netlify or Vercel.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Backend
 
-## Learn More
+- **Purpose:**  
+  Handles all CRUD operations, performs input validation, and manages database interactions.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Technology:**  
+  Built using Node.js and Express.js with a RESTful API architecture.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **Endpoints:**  
+  - `GET /notes` – Fetch all notes.
+  - `POST /notes` – Create a new note.
+  - `PUT /notes/:id` – Update a specific note.
+  - `DELETE /notes/:id` – Delete a specific note.
 
-### Code Splitting
+- **Containerization & Hosting:**  
+  - The backend is containerized using a Dockerfile that installs dependencies, copies source files, and runs the app.
+  - Hosted on free-tier platforms like Render or Railway.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Database
 
-### Analyzing the Bundle Size
+- **Purpose:**  
+  Store diary notes persistently for easy access and management.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- **Technology Options:**  
+  - **Development:** Run MongoDB as a container using the official MongoDB image or use a lightweight embedded solution like SQLite.
+  - **Production:** Use MongoDB Atlas Free Tier for scalable cloud-based storage.
 
-### Making a Progressive Web App
+- **Data Model:**  
+  A single collection (or table) called `notes` with fields:
+  - `id` – Unique identifier.
+  - `title` – Note title.
+  - `content` – Note content.
+  - `created_at` – Timestamp of creation.
+  - `updated_at` – Timestamp of last update.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## CI/CD Pipeline
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Pipeline Stages
 
-### Deployment
+- **Code Commit:**  
+  - Version control via Git and GitHub ensures clear commit messages and collaboration history.
+  
+- **Build & Test:**  
+  - GitHub Actions automates the build process and runs tests for both the frontend and backend.
+  - **Frontend:** Uses Jest/React Testing Library for unit tests and ESLint for code style consistency.
+  - **Backend:** Uses Mocha/Chai/Supertest for API testing and ESLint for backend code quality.
+  
+- **Deploy:**  
+  - Automated Docker image builds for both frontend and backend.
+  - Deployment to hosting platforms:
+    - **Frontend:** Vercel or Netlify.
+    - **Backend:** Render or Railway.
+  - Sensitive information such as API keys and database credentials are managed using environment variables and GitHub Secrets.
+  
+- **Post-Deployment Validation:**  
+  Ensure that even minor changes trigger a CI/CD build and result in a redeployment that updates the live sites.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Security Measures in CI/CD
 
-### `npm run build` fails to minify
+- **Environment Variables:**  
+  Use GitHub Secrets to securely store credentials.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Ports & HTTPS:**  
+  - **Backend:** Listens on PORT (default 5000) and uses HTTP internally while HTTPS is terminated via the hosting provider (e.g. Render).
+  - **Frontend:** Typically served over ports 80/443 (HTTPS), with automatic SSL/TLS certificates provided by Vercel.
+  
+- **Middleware & Input Sanitization:**  
+  - Use `helmet` to secure HTTP headers.
+  - Use `express-validator` to validate incoming data and protect against malicious inputs.
+  - CORS configuration allows only trusted origins.
+
+---
+
+## Container & Docker Compose Integration
+
+### Dockerizing Each Component
+
+- **Frontend Dockerfile:**  
+  - Installs Node.js.
+  - Builds the React app using `npm run build`.
+  - Optionally uses an Nginx image to serve static files efficiently.
+  
+- **Backend Dockerfile:**  
+  - Installs dependencies.
+  - Copies source files.
+  - Exposes the API port for communication.
+  
+- **Database Container:**  
+  - Uses the official MongoDB image with persistent volumes for data storage.
+  
+### Docker Compose
+
+A `docker-compose.yml` file can be used to define and manage all containers (frontend, backend, database) within a single network. This ensures consistent behavior across local development and production.
+
+---
+
+## Next Steps & Deliverables
+
+### Short-Term Actions
+
+- **Finalize Dockerfiles:**  
+  For both the frontend and backend.
+
+- **Configure Database:**  
+  - Set up a free-tier MongoDB Atlas account for production.
+  - Optionally, test locally using Docker Compose.
+
+- **Repository & Collaboration:**  
+  Create a GitHub repository and push regular commits with clear commit messages.
+
+### CI/CD Setup
+
+- **Automated Workflows:**  
+  - Build Docker images.
+  - Run tests and linting.
+  - Deploy to chosen hosting environments.
+
+- **Environment Setup:**  
+  - Use GitHub Actions along with environment variable secrets to manage sensitive data securely.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) installed.
+- [Docker](https://www.docker.com/get-started) for containerization.
+- A MongoDB instance (e.g., MongoDB Atlas free tier or local Docker container).
+
+### Installation
+
+Follow these steps to set up the project locally:
+
+1. **Clone the Repository**
+
+   Open your terminal and run:
+
+   ```bash
+   git clone https://github.com/Liolax/DevOpsSecProject.git
+   cd DevOpsSecProject
+   ```
+
+2. **Set Up the Backend**
+
+   Navigate to the `backend` folder, install dependencies, configure environment variables, and start the server:
+
+   ```bash
+   cd backend
+   npm install
+   ```
+
+   Create a `.env` file in the `backend` folder with your MongoDB connection string and desired port. For example:
+
+   ```env
+   MONGO_URI=your_mongodb_connection_string
+   PORT=5000
+   ```
+
+   Then, start the backend server:
+
+   ```bash
+   npm start
+   ```
+
+3. **Set Up the Frontend**
+
+   Open a new terminal tab or window, navigate to the `frontend` folder, install dependencies, and start the React application:
+
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+
+4. **Run Tests**
+
+   To verify everything works correctly, run the tests:
+
+   - **Frontend Tests:**
+
+     ```bash
+     npm test -- --watchAll=false
+     ```
+
+   - **Backend Tests:**
+
+     ```bash
+     npm test
+     ```
+
+---
+
+### Contributing
+
+Contributions are welcome! To contribute:
+
+- **Fork** the repository.
+- Create a **new branch** for your feature or bug fix.
+- Write clear and concise **commit messages**.
+- Open a **pull request** detailing your changes.
+
+---
+
+### License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+### Acknowledgments
+
+- **Open Source Tools:**  
+  Special thanks to the open-source community for providing tools like React, Express, MongoDB, and Docker.
+
+- **CI/CD Inspiration:**  
+  Inspired by best practices in CI/CD automation and containerization.
+
+---
+```
