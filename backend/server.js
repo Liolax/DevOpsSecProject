@@ -5,7 +5,9 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet"); // Security middleware for HTTP headers
 const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
-require("dotenv").config(); // Load environment variables from .env file
+
+// Explicitly load environment variables from backend/.env
+require("dotenv").config({ path: __dirname + "/.env" });
 
 const app = express();
 
@@ -19,7 +21,7 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-// Connect to MongoDB Atlas with the MONGO_URI stored in the environment
+// Connect to MongoDB Atlas using the MONGO_URI
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("Connected to MongoDB Atlas"))
@@ -191,5 +193,3 @@ const server = app.listen(PORT, () => {
 
 // Export the app for testing purposes
 module.exports = app;
-
-
