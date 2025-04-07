@@ -2,35 +2,41 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const helmet = require("helmet"); // Security middleware for HTTP headers
 const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
 require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT || 5000; // Set port from .env or default to 5000
 
-// MongoDB connection string from .env
+// Set the backend port: Render (or environment) should expose port 5000 for the backend.
+const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB Atlas using connection string from .env
 const MONGO_URI = process.env.MONGO_URI;
-
-// Connect to MongoDB Atlas
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("Connected to MongoDB Atlas"))
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
-    process.exit(1); // Exit the process if the database connection fails
+    process.exit(1); // Exit if the database connection fails
   });
 
-// Enable CORS so that the frontend can call the API
+// Enhance security with Helmet to set secure HTTP headers
+app.use(helmet());
+
+// Enable CORS for allowed origins:
+// Allows calls from the deployed frontend and local development environment
 app.use(cors({
-  origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"], // Allow both deployed and local frontend
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
-  credentials: true // 
+  origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
+// Parse incoming JSON payloads
 app.use(bodyParser.json());
 
-// Define a Note schema and model
+// Define a Mongoose Schema and Model for diary notes
 const noteSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
@@ -40,12 +46,12 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
-// Root route
+// Root route: A simple welcome message
 app.get("/", (req, res) => {
   res.send("Welcome to the DevOpsSec Project Backend!");
 });
 
-// Health endpoint
+// Health endpoint to check server status
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
@@ -132,11 +138,10 @@ app.put(
     console.log(`Updating note with ID: ${req.params.id}`);
 
     try {
-      // Ensure only the specific note is updated
       const updatedNote = await Note.findOneAndUpdate(
         { _id: req.params.id },
         { title, content, updated_at: Date.now() },
-        { new: true, runValidators: true } // Return the updated document and validate fields
+        { new: true, runValidators: true } // Return updated document with validation
       );
 
       if (updatedNote) {
@@ -179,4 +184,5 @@ app.use((err, req, res, next) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log("Note: HTTPS is managed by the hosting provider. The backend exposes only port 5000 for HTTP traffic.");
 });
