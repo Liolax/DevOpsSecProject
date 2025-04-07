@@ -11,31 +11,33 @@ describe("GET /health", () => {
 });
 
 describe("Notes API", () => {
-  it("should create a new note", async () => {
+  it("should create, update, and delete a note", async () => {
+    // Create a new note
     const noteData = {
       title: "Test Note",
       content: "This is a test note."
-    };
-    const res = await request(app)
-      .post("/notes")
-      .send(noteData);
-    expect(res.status).to.equal(201);
-    expect(res.body).to.have.property("id");
-    expect(res.body.title).to.equal(noteData.title);
-    expect(res.body.content).to.equal(noteData.content);
-  });
-
-  it("should delete a note and return 404 when fetching it afterwards", async () => {
-    // First, create a temporary note to delete
-    const noteData = {
-      title: "Temporary Note",
-      content: "This note will be deleted."
     };
     const createRes = await request(app)
       .post("/notes")
       .send(noteData);
     expect(createRes.status).to.equal(201);
+    expect(createRes.body).to.have.property("id");
+    expect(createRes.body.title).to.equal(noteData.title);
+    expect(createRes.body.content).to.equal(noteData.content);
+    
     const noteId = createRes.body.id;
+    
+    // Update the note
+    const updateData = {
+      title: "Updated Test Note",
+      content: "This is an updated test note."
+    };
+    const updateRes = await request(app)
+      .put(`/notes/${noteId}`)
+      .send(updateData);
+    expect(updateRes.status).to.equal(200);
+    expect(updateRes.body.title).to.equal(updateData.title);
+    expect(updateRes.body.content).to.equal(updateData.content);
     
     // Delete the note
     const deleteRes = await request(app)

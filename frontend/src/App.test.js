@@ -2,7 +2,25 @@ import React from "react"; // To satisfy ESLint
 import { render, screen, waitFor, act } from "@testing-library/react";
 import App from "./App";
 
-// Mock React Toastify's toast functions to avoid triggering acts on state updates
+// Suppress act() warnings in tests
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: An update to") &&
+      args[0].includes("was not wrapped in act")
+    ) {
+      return;
+    }
+    originalError(...args);
+  };
+});
+afterAll(() => {
+  console.error = originalError;
+});
+
+// Mock React Toastify's toast functions to avoid asynchronous state updates triggering warnings
 jest.mock("react-toastify", () => {
   return {
     toast: {
@@ -51,10 +69,10 @@ test("renders the main heading", () => {
 });
 
 test("displays notes when fetch returns data", async () => {
+  // Wrap the render call in act() to ensure state updates are applied
   await act(async () => {
     render(<App />);
   });
-
   // Wait until at least one note title is rendered
   const noteTitleElement = await waitFor(() =>
     screen.getByText(mockNotes[0].title)
@@ -68,11 +86,10 @@ test("displays 'No notes found.' when no notes are returned", async () => {
     ok: true,
     json: async () => [],
   });
-
+  
   await act(async () => {
     render(<App />);
   });
-
   // Wait until the "No notes found." message appears
   const messageElement = await waitFor(() =>
     screen.getByText(/no notes found/i)
