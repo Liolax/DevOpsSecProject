@@ -5,12 +5,14 @@
 /.pnp
 .pnp.js
 
-# testing
+# testing output
 /coverage
 
+# production build outputs (for Create React App and custom webpack builds)
 /build
+/dist
 
-# misc
+# miscellaneous
 .DS_Store
 .env.local
 .env.development.local

@@ -3,14 +3,14 @@
 # dependencies
 /node_modules
 
-# testing
+# testing output
 /coverage
 
-# production
+# production build outputs
 /dist
 /build
 
-# misc
+# miscellaneous
 .DS_Store
 .env
 .env.local
@@ -23,6 +23,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Debug script
 debug-mongo.js
-
-
