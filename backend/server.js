@@ -56,11 +56,13 @@ const Note = mongoose.model("Note", noteSchema);
 
 // Root route
 app.get("/", (req, res) => {
+  console.log("Root route requested");
   res.send("Welcome to the DevOpsSec Project Backend!");
 });
 
 // Health endpoint to check server status
 app.get("/health", (req, res) => {
+  console.log("Health endpoint requested");
   res.status(200).json({ status: "OK" });
 });
 
@@ -180,13 +182,13 @@ app.delete("/notes/:id", async (req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   console.error("Unhandled error:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// Start the server
-const server = app.listen(PORT, () => {
+// Start the server without assigning it to a variable
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log("Note: HTTPS termination is managed by the hosting provider (Render).");
 });
