@@ -11,8 +11,6 @@ describe("GET /health", () => {
 });
 
 describe("Notes API", () => {
-  let createdNoteId; // To store the note ID created in the test
-
   it("should create a new note", async () => {
     const noteData = {
       title: "Test Note",
@@ -25,9 +23,6 @@ describe("Notes API", () => {
     expect(res.body).to.have.property("id");
     expect(res.body.title).to.equal(noteData.title);
     expect(res.body.content).to.equal(noteData.content);
-    
-    // Save the created note ID for possible further testing
-    createdNoteId = res.body.id;
   });
 
   it("should delete a note and return 404 when fetching it afterwards", async () => {

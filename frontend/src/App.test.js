@@ -2,6 +2,17 @@ import React from "react"; // To satisfy ESLint
 import { render, screen, waitFor, act } from "@testing-library/react";
 import App from "./App";
 
+// Mock React Toastify's toast functions to avoid triggering acts on state updates
+jest.mock("react-toastify", () => {
+  return {
+    toast: {
+      success: jest.fn(),
+      error: jest.fn(),
+    },
+    ToastContainer: () => <div data-testid="toast-container" />,
+  };
+});
+
 // A mock array of notes to simulate data coming from the API
 const mockNotes = [
   {
