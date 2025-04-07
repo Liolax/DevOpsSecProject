@@ -23,10 +23,35 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-// Connect to MongoDB Atlas using the MONGO_URI
+// Define a Mongoose Schema and Model for diary notes BEFORE connecting.
+const noteSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+});
+const Note = mongoose.model("Note", noteSchema);
+
+// Connect to MongoDB Atlas, seed a default note if none exist, then start the server.
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("Connected to MongoDB Atlas"))
+  .then(async () => {
+    console.log("Connected to MongoDB Atlas");
+    const noteCount = await Note.countDocuments();
+    if (noteCount === 0) {
+      const defaultNote = new Note({
+        title: "Welcome to Your Diary!",
+        content: "This is your first note. Feel free to edit or delete it."
+      });
+      await defaultNote.save();
+      console.log("Inserted default note into the database.");
+    }
+    // Start the server only after connection and seeding have completed.
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+      console.log("Note: HTTPS termination is managed by the hosting provider (Render).");
+    });
+  })
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
     process.exit(1); // Exit if the database connection fails
@@ -35,10 +60,22 @@ mongoose
 // Enhance security by setting HTTP headers with Helmet
 app.use(helmet());
 
-// Enable CORS so that only the necessary origins can access the API
+// Enable CORS with dynamic origin validation
 app.use(
   cors({
-    origin: ["https://diary-notes-project.vercel.app", "http://localhost:3000"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      const allowedOrigins = [
+        "https://diary-notes-project.vercel.app",
+        "http://localhost:3000"
+      ];
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -46,15 +83,6 @@ app.use(
 
 // Parse incoming JSON payloads
 app.use(bodyParser.json());
-
-// Define a Mongoose Schema and Model for diary notes
-const noteSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now },
-});
-const Note = mongoose.model("Note", noteSchema);
 
 // Root route
 app.get("/", (req, res) => {
@@ -188,12 +216,6 @@ app.delete("/notes/:id", async (req, res) => {
 app.use((err, req, res, _next) => {
   console.error("Unhandled error:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
-});
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log("Note: HTTPS termination is managed by the hosting provider (Render).");
 });
 
 // Export the app for testing purposes
