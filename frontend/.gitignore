@@ -9,8 +9,8 @@
 /coverage
 
 # production build outputs (for Create React App and custom webpack builds)
-/build
-/dist
+ /build
+ /dist
 
 # miscellaneous
 .DS_Store
