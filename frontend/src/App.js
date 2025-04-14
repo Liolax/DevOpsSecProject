@@ -185,7 +185,7 @@ function App() {
 
       {/* Notes List */}
       <div className="notes-list">
-        <h2>Diary Notes</h2>
+        <h2>My Notes</h2>
         {currentNotes.length === 0 ? (
           <p>No notes found.</p>
         ) : (
